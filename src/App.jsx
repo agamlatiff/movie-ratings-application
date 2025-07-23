@@ -19,11 +19,11 @@ const App = () => {
   const [movieList, setMovieList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchMovies = async () => {
+  const fetchMovies = async (query = '') => {
     setIsLoading(true);
     setErrorMessage("");
     try {
-      const endpoint = `${API_BASE_URL}?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc`;
+      const endpoint = query ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}`: `${API_BASE_URL}?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc`;
       const response = await fetch(endpoint, API_OPTIONS);
       if (!response.ok) {
         throw new Error("Failed to fetch movies");
@@ -49,8 +49,8 @@ const App = () => {
   };
 
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    fetchMovies(searchTerm);
+  }, [searchTerm]);
   return (
     <main>
       <div className="pattern"></div>
@@ -65,14 +65,14 @@ const App = () => {
 
         <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
-        <section className="all-movies">
+        <section className="all-movies mt-15">
           <h2 className="mt-[4 0px]">All Movies</h2>
           {isLoading ? (
             <Spinner/>
           ) : errorMessage ? (
             <p className="text-red-500">{errorMessage}</p>
           ) : (
-            <ul>
+            <ul className="max-sm:grid-cols-1">
               {movieList.map((movie) => (
                   <MovieCard key={movie.id} movie={movie}/>
               ))}
